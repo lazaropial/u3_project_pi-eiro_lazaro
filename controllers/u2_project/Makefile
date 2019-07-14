@@ -67,6 +67,7 @@
 ###
 ###-----------------------------------------------------------------------------
 
+#C_SOURCES = u2_project.c autonomous.c
 ### Do not modify: this includes Webots global Makefile.include
 space :=
 space +=

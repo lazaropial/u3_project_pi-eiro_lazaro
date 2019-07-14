@@ -6,45 +6,110 @@
  * Modifications:
  */
 
-#include <webots/robot.h>
-#include <webots/motor.h>
-#include <webots/distance_sensor.h>
-#include <webots/position_sensor.h>
-#include <webots/keyboard.h>
+ #include <webots/robot.h>
+ #include <webots/motor.h>
+ #include <webots/distance_sensor.h>
+ #include <webots/position_sensor.h>
+ #include <webots/keyboard.h>
 
-#include <stdio.h>
+ #include <stdio.h>
+ 
+ //#include <autonomous.h>
 
 /*
  * You may want to add macros here.
  */
-#define TIME_STEP 64
-#define PI 3.1416
+ #define TIME_STEP 64
+ #define PI 3.1416
+ 
+ enum {
+ AUTOMATIC,
+ MANUAL
+ };
 
 /*variables globales*/
-double b=0;
-double b1=0;
-double b2=0;
-double dl,dr;
-int veces=0;
-int veces2=0;
+ double b=0;
+ double b1=0;
+ double b2=0;
+ double dl,dr;
+ int veces=0;
+ int veces2=0;
+ int m;
+ short int robot_state;
+
 /////////variables para el encoder///
-double pos_final, pos_final1, pos_final2;
-double a, a1, a2;
-double rpm, rpm1, rpm2;
+ double pos_final, pos_final1, pos_final2;
+ double a, a1, a2;
+ double rpm, rpm1, rpm2;
 
 /////variables para la velocidad lineal
-float rad=0.06; //radio de la llanta
-double vel, vel1,vel2;//velocidad lineal por llanta
-double vel_rob; //velocidad lineal del robot
+ float rad=0.06; //radio de la llanta
+ double vel, vel1,vel2;//velocidad lineal por llanta
+ double vel_rob; //velocidad lineal del robot
+ 
+ 
+ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3, WbDeviceTag ds_l, WbDeviceTag ds_r) {
+ 
 
-int main(int argc, char **argv)
-{
+ 
+dl=(wb_distance_sensor_get_value(ds_l)*0.2)/65535;
+  dr=(wb_distance_sensor_get_value(ds_r)*0.2)/65535;
+  
+ 
+ wb_motor_set_position(wheel1, INFINITY);
+  wb_motor_set_velocity(wheel1, 0);
+  wb_motor_set_position(wheel2, INFINITY);
+  wb_motor_set_velocity(wheel2, -1);
+  wb_motor_set_position(wheel3, INFINITY);
+  wb_motor_set_velocity(wheel3, 1);
+  
+  
+        
+    if (dl<=0.17 && dl<dr) {
+      veces++;
+    }
+    if (veces>=1 && veces<=58) {
+      wb_motor_set_position(wheel1, INFINITY);
+      wb_motor_set_velocity(wheel1, 1);
+      wb_motor_set_position(wheel2, INFINITY);
+      wb_motor_set_velocity(wheel2, 1);
+      wb_motor_set_position(wheel3, INFINITY);
+      wb_motor_set_velocity(wheel3, 1);
+      veces++;
+    }
+    
+    else {
+      veces=0;
+    }
+       
+    if (dr<0.17 && dr<dl) {
+      veces2++;
+    }
+     
+    if (veces2>=1 && veces2<=58) { 
+      wb_motor_set_position(wheel1, INFINITY);
+      wb_motor_set_velocity(wheel1, -1);
+      wb_motor_set_position(wheel2, INFINITY);
+      wb_motor_set_velocity(wheel2, -1);
+      wb_motor_set_position(wheel3, INFINITY);
+      wb_motor_set_velocity(wheel3, -1);
+      veces2++;
+    }
+     
+    else {
+      veces2=0;
+    }
+  
+ }
+ 
+ 
+ int main(int argc, char **argv)
+ {
   wb_robot_init(); 
 
   WbDeviceTag wheel1 = wb_robot_get_device("motor1");
   WbDeviceTag wheel2 = wb_robot_get_device("motor2");
-  WbDeviceTag wheel3 = wb_robot_get_device("motor3");
-   
+  WbDeviceTag wheel3 = wb_robot_get_device("motor3"); 
    
   /////////position sensor//////////
   WbDeviceTag ps1 = wb_robot_get_device("pos1");
@@ -60,10 +125,12 @@ int main(int argc, char **argv)
   wb_distance_sensor_enable(ds_l, TIME_STEP);   
   wb_distance_sensor_enable(ds_r, TIME_STEP); 
   
+  wb_keyboard_enable(TIME_STEP);
+  
   while (wb_robot_step(TIME_STEP) != -1) {
   
-  dl=(wb_distance_sensor_get_value(ds_l)*0.2)/65535;
-  dr=(wb_distance_sensor_get_value(ds_r)*0.2)/65535;
+  //dl=(wb_distance_sensor_get_value(ds_l)*0.2)/65535;
+  //dr=(wb_distance_sensor_get_value(ds_r)*0.2)/65535;
   
   ////rueda #1 //////////////
   a = wb_position_sensor_get_value(ps1);
@@ -103,49 +170,36 @@ int main(int argc, char **argv)
   vel_rob=(vel+vel1+vel2)/3;
   
   /////////////movimiento del motor////////
-  wb_motor_set_position(wheel1, INFINITY);
-  wb_motor_set_velocity(wheel1, 0);
-  wb_motor_set_position(wheel2, INFINITY);
-  wb_motor_set_velocity(wheel2, -1);
-  wb_motor_set_position(wheel3, INFINITY);
-  wb_motor_set_velocity(wheel3, 1);
-        
-    if (dl<=0.17 && dl<dr) {
-      veces++;
-    }
-    if (veces>=1 && veces<=58){
-      wb_motor_set_position(wheel1, INFINITY);
-      wb_motor_set_velocity(wheel1, 1);
-      wb_motor_set_position(wheel2, INFINITY);
-      wb_motor_set_velocity(wheel2, 1);
-      wb_motor_set_position(wheel3, INFINITY);
-      wb_motor_set_velocity(wheel3, 1);
-      veces++;
+  int key=wb_keyboard_get_key();
+  
+  
+    if (key == 'G' || robot_state == AUTOMATIC) {
+      //m=1;
+      
+      autonomousMode(wheel1,wheel2,wheel3,ds_l,ds_r);
+      robot_state = AUTOMATIC;
     }
     
-    else {
-      veces=0;
-    }
-       
-    if (dr<0.17 && dr<dl) {
-      veces2++;
-    }
-     
-    if (veces2>=1 && veces2<=58){
+    if (key == 'W') {
+      robot_state=MANUAL;
       wb_motor_set_position(wheel1, INFINITY);
-      wb_motor_set_velocity(wheel1, -1);
+      wb_motor_set_velocity(wheel1, 0);
       wb_motor_set_position(wheel2, INFINITY);
-      wb_motor_set_velocity(wheel2, -1);
+      wb_motor_set_velocity(wheel2, 0);
       wb_motor_set_position(wheel3, INFINITY);
-      wb_motor_set_velocity(wheel3, -1);
-      veces2++;
+      wb_motor_set_velocity(wheel3, 0);
+      
+       if (key == WB_KEYBOARD_LEFT) {
+         wb_motor_set_position(wheel1, INFINITY);
+         wb_motor_set_velocity(wheel1, 1);
+         wb_motor_set_position(wheel2, INFINITY);
+         wb_motor_set_velocity(wheel2, -1);
+         wb_motor_set_position(wheel3, INFINITY);
+         wb_motor_set_velocity(wheel3, 0);
+       }
     }
-     
-    else {
-      veces2=0;
-    }
-    
-  printf("RPM_1= %f RPM\tRPM_2= %f RPM\tRPM_3= %f RPM\tlinear velocity= %f m/s\tds_l=%f\tds_r=%f\t%i\n",rpm,rpm1,rpm2,vel_rob,dl,dr,veces);
+         
+  printf("MODO: %i\tRPM_1= %f RPM\tRPM_2= %f RPM\tRPM_3= %f RPM\tlinear velocity= %f m/s\tds_l=%f\tds_r=%f\t%i\n",robot_state,rpm,rpm1,rpm2,vel_rob,dl,dr,veces);
     
   };
 
