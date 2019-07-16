@@ -1,11 +1,10 @@
 /*
- * File: u2_exam_Pieiro_Lazaro.c
- * Date: 9 de julio del 2019
+ * File: u3_project_Pieiro_Lazaro.c
+ * Date: 16 de julio del 2019
  * Description:
  * Author: Lazaro Piñeiro Alcocer
  * Modifications:
  */
-
  #include <webots/robot.h>
  #include <webots/motor.h>
  #include <webots/distance_sensor.h>
@@ -17,9 +16,6 @@
  #include <promedio.h>
  #include <velocidad.h>
 
-/*
- * You may want to add macros here.
- */
  #define TIME_STEP 64
  #define PI 3.1416
 
@@ -27,12 +23,10 @@
  AUTOMATIC,
  MANUAL
  };
-
 /*variables globales*/
  double b, b1, b2=0;
  double dl,dr;
  int veces, veces2=0;
- int m;
  short int robot_state;
  int paro;
 
@@ -71,9 +65,9 @@
  }
 
  void rightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, -0.9);
-   wb_motor_set_velocity(wheel2, 0.4);
-   wb_motor_set_velocity(wheel3, 0.4);
+   wb_motor_set_velocity(wheel1, -8);
+   wb_motor_set_velocity(wheel2, 4);
+   wb_motor_set_velocity(wheel3, 4);
  }
 
  void turnRightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
@@ -108,26 +102,20 @@
     turnRightRobot(wheel1, wheel2, wheel3);
       veces++;
     }
-
     else {
       veces=0;
     }
-
     if (dr<0.17 && dr<dl) {
       veces2++;
     }
-
     if (veces2>=1 && veces2<=58) {
       turnLeftRobot(wheel1, wheel2, wheel3);
       veces2++;
     }
-
     else {
       veces2=0;
     }
-
  }
-
 
  int main(int argc, char **argv)
  {
@@ -223,7 +211,6 @@
     if(key=='S' && robot_state == MANUAL) {
       turnRightRobot(wheel1,wheel2,wheel3);
     }
-
 
   printf("MODO: %i\tRPM_1= %f RPM\tRPM_2= %f RPM\tRPM_3= %f RPM\
   linear velocity= %f m/s\tds_l=%f\tds_r=%f\t%i\n"
