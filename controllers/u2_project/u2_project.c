@@ -15,6 +15,7 @@
  #include <stdio.h>
 
  #include <promedio.h>
+ #include <velocidad.h>
 
 /*
  * You may want to add macros here.
@@ -28,12 +29,9 @@
  };
 
 /*variables globales*/
- double b=0;
- double b1=0;
- double b2=0;
+ double b, b1, b2=0;
  double dl,dr;
- int veces=0;
- int veces2=0;
+ int veces, veces2=0;
  int m;
  short int robot_state;
  int paro;
@@ -48,10 +46,50 @@
  double vel, vel1,vel2;//velocidad lineal por llanta
  double vel_rob; //velocidad lineal del robot
 
+ void stopRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, 0);
+   wb_motor_set_velocity(wheel2, 0);
+   wb_motor_set_velocity(wheel3, 0);
+ }
 
- void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3, WbDeviceTag ds_l, WbDeviceTag ds_r) {
+ void forwardRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, 0);
+   wb_motor_set_velocity(wheel2, -5);
+   wb_motor_set_velocity(wheel3, 5);
+ }
 
+ void backwardRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, 0);
+   wb_motor_set_velocity(wheel2, 5);
+   wb_motor_set_velocity(wheel3, -5);
+ }
 
+ void leftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, 8);
+   wb_motor_set_velocity(wheel2, -4);
+   wb_motor_set_velocity(wheel3, -4);
+ }
+
+ void rightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, -0.9);
+   wb_motor_set_velocity(wheel2, 0.4);
+   wb_motor_set_velocity(wheel3, 0.4);
+ }
+
+ void turnRightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, 0.7853);
+   wb_motor_set_velocity(wheel2, 0.7853);
+   wb_motor_set_velocity(wheel3, 0.7853);
+ }
+
+ void turnLeftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
+   wb_motor_set_velocity(wheel1, -0.7853);
+   wb_motor_set_velocity(wheel2, -0.7853);
+   wb_motor_set_velocity(wheel3, -0.7853);
+ }
+
+ void autonomousMode (WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3,
+                      WbDeviceTag ds_l, WbDeviceTag ds_r) {
 
   dl=(wb_distance_sensor_get_value(ds_l)*0.2)/65535;
   dr=(wb_distance_sensor_get_value(ds_r)*0.2)/65535;
@@ -59,18 +97,15 @@
   wb_motor_set_position(wheel1, INFINITY);
   wb_motor_set_velocity(wheel1, 0);
   wb_motor_set_position(wheel2, INFINITY);
-  wb_motor_set_velocity(wheel2, -1);
+  wb_motor_set_velocity(wheel2, -6.66);
   wb_motor_set_position(wheel3, INFINITY);
-  wb_motor_set_velocity(wheel3, 1);
-
+  wb_motor_set_velocity(wheel3, 6.66);
 
     if (dl<=0.17 && dl<dr) {
       veces++;
     }
     if (veces>=1 && veces<=58) {
-      wb_motor_set_velocity(wheel1, 1);
-      wb_motor_set_velocity(wheel2, 1);
-      wb_motor_set_velocity(wheel3, 1);
+    turnRightRobot(wheel1, wheel2, wheel3);
       veces++;
     }
 
@@ -83,9 +118,7 @@
     }
 
     if (veces2>=1 && veces2<=58) {
-      wb_motor_set_velocity(wheel1, -1);
-      wb_motor_set_velocity(wheel2, -1);
-      wb_motor_set_velocity(wheel3, -1);
+      turnLeftRobot(wheel1, wheel2, wheel3);
       veces2++;
     }
 
@@ -93,48 +126,6 @@
       veces2=0;
     }
 
- }
-
- void stopRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, 0);
-   wb_motor_set_velocity(wheel2, 0);
-   wb_motor_set_velocity(wheel3, 0);
- }
-
- void forwardRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, 0);
-   wb_motor_set_velocity(wheel2, -1);
-   wb_motor_set_velocity(wheel3, 1);
- }
-
- void backwardRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, 0);
-   wb_motor_set_velocity(wheel2, 1);
-   wb_motor_set_velocity(wheel3, -1);
- }
-
- void leftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, 0.9);
-   wb_motor_set_velocity(wheel2, -0.4);
-   wb_motor_set_velocity(wheel3, -0.4);
- }
-
- void rightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, -0.9);
-   wb_motor_set_velocity(wheel2, 0.4);
-   wb_motor_set_velocity(wheel3, 0.4);
- }
-
- void turnRightRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, 1);
-   wb_motor_set_velocity(wheel2, 1);
-   wb_motor_set_velocity(wheel3, 1);
- }
-
- void turnLeftRobot(WbDeviceTag wheel1,WbDeviceTag wheel2,WbDeviceTag wheel3) {
-   wb_motor_set_velocity(wheel1, -1);
-   wb_motor_set_velocity(wheel2, -1);
-   wb_motor_set_velocity(wheel3, -1);
  }
 
 
@@ -186,21 +177,9 @@
   b2 = a2;
 
   /////////velocidad lineal del robot///////
-  vel=pos_final*rad;
-  vel1=pos_final1*rad;
-  vel2=pos_final2*rad;
-
-    if (pos_final<0) {
-      vel=vel*-1;
-    }
-
-    if (pos_final1<0) {
-      vel1=vel1*-1;
-    }
-
-    if (pos_final2<0) {
-      vel2=vel2*-1;
-    }
+  vel=velocidad(vel,pos_final,rad);
+  vel1=velocidad(vel1,pos_final1,rad);
+  vel2=velocidad(vel2,pos_final2,rad);
 
   vel_rob=prom(vel,vel1,vel2);
 
@@ -208,8 +187,6 @@
   int key=wb_keyboard_get_key();
 
     if (key == 'G' || robot_state == AUTOMATIC) {
-      //m=1;
-
       autonomousMode(wheel1,wheel2,wheel3,ds_l,ds_r);
       robot_state = AUTOMATIC;
     }
