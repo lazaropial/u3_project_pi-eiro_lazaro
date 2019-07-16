@@ -67,7 +67,7 @@
 ###
 ###-----------------------------------------------------------------------------
 
-#C_SOURCES = u2_project.c autonomous.c
+C_SOURCES = u2_project.c promedio.c
 ### Do not modify: this includes Webots global Makefile.include
 space :=
 space +=

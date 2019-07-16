@@ -14,7 +14,7 @@
 
  #include <stdio.h>
 
- //#include <autonomous.h>
+ #include <promedio.h>
 
 /*
  * You may want to add macros here.
@@ -24,8 +24,7 @@
 
  enum {
  AUTOMATIC,
- MANUAL,
- GO
+ MANUAL
  };
 
 /*variables globales*/
@@ -63,7 +62,6 @@
   wb_motor_set_velocity(wheel2, -1);
   wb_motor_set_position(wheel3, INFINITY);
   wb_motor_set_velocity(wheel3, 1);
-
 
 
     if (dl<=0.17 && dl<dr) {
@@ -148,10 +146,6 @@
   WbDeviceTag wheel2 = wb_robot_get_device("motor2");
   WbDeviceTag wheel3 = wb_robot_get_device("motor3");
 
-  //wb_motor_set_position(wheel1, INFINITY);
-  //wb_motor_set_position(wheel2, INFINITY);
-  //wb_motor_set_position(wheel3, INFINITY);
-
   /////////position sensor//////////
   WbDeviceTag ps1 = wb_robot_get_device("pos1");
   WbDeviceTag ps2 = wb_robot_get_device("pos2");
@@ -172,7 +166,6 @@
 
   dl=(wb_distance_sensor_get_value(ds_l)*0.2)/65535;
   dr=(wb_distance_sensor_get_value(ds_r)*0.2)/65535;
-
 
   ////rueda #1 //////////////
   a = wb_position_sensor_get_value(ps1);
@@ -209,12 +202,10 @@
       vel2=vel2*-1;
     }
 
-  vel_rob=(vel+vel1+vel2)/3;
+  vel_rob=prom(vel,vel1,vel2);
 
   /////////////movimiento del motor////////
   int key=wb_keyboard_get_key();
-
-
 
     if (key == 'G' || robot_state == AUTOMATIC) {
       //m=1;
